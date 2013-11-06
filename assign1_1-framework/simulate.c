@@ -30,23 +30,28 @@ struct Args
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
-	int tid =  * (int *) a;
+	int thread_id =  (unsigned int)pthread_self();
+
+	printf("thread id %d\n", thread_id);
+
+	int prev;
+	int next;
 
 	for(int i = begin; i < end; i++){
 		if(i < 0){
-			prev = data->i_max;
+			prev = data.i_max;
 		}else{
 			prev = i;
 		}
 
-		if(i >= data->i_max){
+		if(i >= data.i_max){
 			next = 0;
 		}else{
 			next = i;
 		}
 
 		data->next_array[i] = (2.0F * data->current_array[i]) -
-				data->old_array[i] + 0.2 * (data->current_array[prev] - 
+				data->old_array[i] + 0.2F * (data->current_array[prev] - 
 				(2.0F * data->current_array[i], data->current_array[next]));
 	}
 
@@ -69,6 +74,7 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
+
     int master_size;
     int worker_size;
     /*
@@ -82,9 +88,6 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     data.current_array = current_array;
     data.next_array = next_array;
     data.i_max = i_max;
-
-
-    printf("worker_size: %d\n", data.worker_size);
 
     pthread_t thread_ids [ num_threads ];
     void * results [ num_threads ];
@@ -106,6 +109,8 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
         pthread_join ( thread_ids [i], & results [i ]);
         printf("joined %d\n", i);
     }
+    
+    printf("worker_size: %d\n", data.worker_size);
 
     /* You should return a pointer to the array with the final results. */
     return current_array;
