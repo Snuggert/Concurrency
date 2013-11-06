@@ -7,12 +7,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-
 #include "simulate.h"
 
 
 /* Add any global variables you may need. */
+struct Data
+{
+    double *old_array;
+    double *current_array;
+    double *next_array;
+    int i_max;
+    int worker_size;
+}; 
 
+struct Data data;
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
@@ -55,6 +63,7 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
+<<<<<<< HEAD
 
 	pthread_t thread_ids [ num_threads ];
 	void * results [ num_threads ];
@@ -76,10 +85,25 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 
 
 
+=======
+    int master_size;
+    int worker_size;
+>>>>>>> struct bitch
     /*
      * After each timestep, you should swap the buffers around. Watch out none
      * of the threads actually use the buffers at that time.
      */
+    worker_size = (int)(i_max / num_threads);
+    master_size = i_max - (num_threads - 1) * worker_size;
+
+    data.old_array = old_array;
+    data.current_array = current_array;
+    data.next_array = next_array;
+    data.i_max = i_max;
+    data.worker_size = worker_size;
+
+
+    printf("worker_size: %d\n", data.worker_size);
 
 
 
