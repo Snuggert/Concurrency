@@ -17,10 +17,16 @@ struct Data
     double *current_array;
     double *next_array;
     int i_max;
-    int worker_size;
 }; 
 
 struct Data data;
+
+struct Args
+{
+    int begin;
+    int size;
+    int id;
+};
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
@@ -76,7 +82,6 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     data.current_array = current_array;
     data.next_array = next_array;
     data.i_max = i_max;
-    data.worker_size = worker_size;
 
 
     printf("worker_size: %d\n", data.worker_size);
@@ -86,11 +91,15 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 
     int i;
     for (i =0; i < num_threads ; i ++) {
+        struct Args arg;
+        arg.begin = worker_size * i;
+        args.size = worker_size;
+        args.id = i;
         printf("created %d\n", i);
         pthread_create ( & thread_ids [i] , /* returned thread ids */
                 NULL ,                      /* default attributes */
                 &wave_thread ,              /* start routine */
-                i );                    /* argument */
+                arg);                    /* argument */
     }
 
     for (i =0; i < num_threads ; i ++) {
