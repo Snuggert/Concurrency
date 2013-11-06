@@ -105,9 +105,13 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
                 &arg);                    /* argument */
     }
 
-    for (i =0; i < num_threads ; i ++) {
-        pthread_join ( thread_ids [i], & results [i ]);
-        printf("joined %d\n", i);
+    for (i =0; i < num_threads - 1; i ++) {
+        if(pthread_join ( thread_ids [i], & results [i ]) == 0){
+            printf("joined %d\n", i);           
+        }
+        else{
+            printf("shit got fucked: %d\n", i);
+        }
     }
     
     /* You should return a pointer to the array with the final results. */
