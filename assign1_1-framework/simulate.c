@@ -76,16 +76,15 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
-    int master_size;
-    int worker_size;
-    int i;
+    int worker_size, workerthreads i;
+    workerthreads = num_threads - 1;
     /*
      * After each timestep, you should swap the buffers around. Watch out none
      * of the threads actually use the buffers at that time.
      */
     worker_size = (int)(i_max / num_threads);
-    master_size = i_max - (num_threads - 1) * worker_size;
 
+    // Fill up the global struct.
     data.old_array = old_array;
     data.current_array = current_array;
     data.next_array = next_array;
@@ -94,9 +93,15 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     pthread_t thread_ids [ num_threads ];
     void * results [ num_threads ];
 
-    struct Args args[num_threads - 1];
+    // This is where the master threads args are defined.
+    struct Args master_arg;
+    master_arg.begin = workerthreads * worker_size;
+    master_arg.size = i_max - (workerthreads) * worker_size;
+    arg.id = workerthreads;
 
-    for(i = 0; i < num_threads - 1; i++){
+    // This is where the args for the worker threads are defined.
+    struct Args args[workerthreads];
+    for(i = 0; i < workerthreads; i++){
         struct Args arg;
         arg.begin = worker_size * i;
         arg.size = worker_size;
@@ -104,7 +109,8 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
         args[i] = arg;
     }
 
-    for (i =0; i < num_threads - 1; i++){
+    // This is where the loop for time t starts.
+    for (i =0; i < workerthreads; i++){
         printf("created %d\n", i);
         pthread_create ( & thread_ids [i] , /* returned thread ids */
                 NULL ,                      /* default attributes */
@@ -112,15 +118,27 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
                 &args[i]);                    /* argument */
     }
 
-    for (i =0; i < num_threads - 1; i ++) {
-        if(pthread_join ( thread_ids [i], & results [i ]) == 0){
+    // This is where the master_thread starts its own work.
+    wave_thread(master_arg);
+
+    // This is where the master waits for all the threads to finish work on the 
+    // next_array.
+    for (i =0; i < workerthreads; i ++) {
+        if(pthread_join( thread_ids[i], &results[i]) == 0){
             printf("joined %d\n", i);           
         }
         else{
             printf("shit got fucked: %d\n", i);
         }
     }
+    // This is where you switch current array to old_array and next_array to
+    // current_array.
+    free(data.old_array)
+    data.old_array = data.current_array;
+    data.current_array = data.next_array;
+    data.next_array = malloc(sizeof(current_array));
+    // This is where the loop for time t ends.
     
     /* You should return a pointer to the array with the final results. */
-    return current_array;
+    return data.current_array;
 }
