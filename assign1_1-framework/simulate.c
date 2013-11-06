@@ -24,16 +24,21 @@ struct Data data;
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
-	int tid =  * (int *) a;
+	int thread_id =  (unsigned int)pthread_self();
+
+	printf("thread id %d\n", thread_id);
+
+	int prev;
+	int next;
 
 	for(int i = begin; i < end; i++){
 		if(i < 0){
-			prev = data->i_max;
+			prev = data.i_max;
 		}else{
 			prev = i;
 		}
 
-		if(i >= data->i_max){
+		if(i >= data.i_max){
 			next = 0;
 		}else{
 			next = i;
@@ -63,32 +68,10 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
-<<<<<<< HEAD
-
-	pthread_t thread_ids [ num_threads ];
-	void * results [ num_threads ];
-
-	int i;
-	for (i =0; i < num_threads ; i ++) {
-		printf("created %d\n", i);
-		pthread_create ( & thread_ids [i] , /* returned thread ids */
-				NULL , 						/* default attributes */
-				&wave_thread , 				/* start routine */
-				i ); 					/* argument */
-	}
-
-	for (i =0; i < num_threads ; i ++) {
-		pthread_join ( thread_ids [i], & results [i ]);
-		printf("joined %d\n", i);
-	}
 
 
-
-
-=======
     int master_size;
     int worker_size;
->>>>>>> struct bitch
     /*
      * After each timestep, you should swap the buffers around. Watch out none
      * of the threads actually use the buffers at that time.
@@ -102,6 +85,22 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     data.i_max = i_max;
     data.worker_size = worker_size;
 
+	pthread_t thread_ids [ num_threads ];
+	void * results [ num_threads ];
+
+	int i;
+	for (i =0; i < num_threads ; i ++) {
+		printf("created %d\n", i);
+		pthread_create ( & thread_ids [i] , /* returned thread ids */
+				NULL , 						/* default attributes */
+				&wave_thread , 				/* start routine */
+				&i ); 					/* argument */
+	}
+
+	for (i =0; i < num_threads ; i ++) {
+		pthread_join ( thread_ids [i], & results [i ]);
+		printf("joined %d\n", i);
+	}
 
     printf("worker_size: %d\n", data.worker_size);
 
