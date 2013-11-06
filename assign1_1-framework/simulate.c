@@ -76,7 +76,7 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
-    int worker_size, workerthreads i;
+    int worker_size, workerthreads, i;
     workerthreads = num_threads - 1;
     /*
      * After each timestep, you should swap the buffers around. Watch out none
@@ -97,7 +97,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     struct Args master_arg;
     master_arg.begin = workerthreads * worker_size;
     master_arg.size = i_max - (workerthreads) * worker_size;
-    arg.id = workerthreads;
+    master_arg.id = workerthreads;
 
     // This is where the args for the worker threads are defined.
     struct Args args[workerthreads];
@@ -119,7 +119,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     }
 
     // This is where the master_thread starts its own work.
-    wave_thread(master_arg);
+    wave_thread(&master_arg);
 
     // This is where the master waits for all the threads to finish work on the 
     // next_array.
@@ -133,7 +133,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     }
     // This is where you switch current array to old_array and next_array to
     // current_array.
-    free(data.old_array)
+    free(data.old_array);
     data.old_array = data.current_array;
     data.current_array = data.next_array;
     data.next_array = malloc(sizeof(current_array));
