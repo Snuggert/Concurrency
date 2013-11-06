@@ -30,14 +30,15 @@ struct Args
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
-	int thread_id =  (unsigned int)pthread_self();
+	struct arguments *args = (struct arguments *)a;
+	// int thread_id =  (unsigned int)pthread_self();
 
-	printf("thread id %d\n", thread_id);
+	printf("thread id %d\n", args->id);
 
 	int prev;
 	int next;
 
-	for(int i = begin; i < end; i++){
+	for(int i = args->start; i < (args->size + args->start); i++){
 		if(i < 0){
 			prev = data.i_max;
 		}else{
