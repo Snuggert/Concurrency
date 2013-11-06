@@ -30,15 +30,16 @@ struct Args
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
-	struct Args *args = (struct Args *)a;
+	struct Args *arg = (struct Args*)a;
 	// int thread_id =  (unsigned int)pthread_self();
 
-	printf("thread id %d\n", args->id);
+    printf("thread begin %d\nthread size %d\nthread id %d\n", arg->begin, 
+        arg->size, arg->id);
 
 	int prev;
 	int next;
 
-	for(int i = args->begin; i < (args->size + args->begin); i++){
+	for(int i = arg->begin; i < (arg->size + arg->begin); i++){
 		if(i < 0){
 			prev = data.i_max;
 		}else{
@@ -77,6 +78,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 {
     int master_size;
     int worker_size;
+    int i;
     /*
      * After each timestep, you should swap the buffers around. Watch out none
      * of the threads actually use the buffers at that time.
@@ -92,17 +94,22 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     pthread_t thread_ids [ num_threads ];
     void * results [ num_threads ];
 
-    int i;
-    for (i =0; i < num_threads - 1; i ++) {
-        struct Args* arg = (struct Args*)malloc(sizeof(struct Args));
-        arg->begin = worker_size * i;
-        arg->size = worker_size;
-        arg->id = i;
+    struct Args args[num_threads - 1];
+
+    for(i = 0; i < num_threads - 1; i++){
+        struct Args arg;
+        arg.begin = worker_size * i;
+        arg.size = worker_size;
+        arg.id = i;
+        args[i] = arg;
+    }
+
+    for (i =0; i < num_threads - 1; i++){
         printf("created %d\n", i);
         pthread_create ( & thread_ids [i] , /* returned thread ids */
                 NULL ,                      /* default attributes */
                 &wave_thread ,              /* start routine */
-                &arg);                    /* argument */
+                &args[i]);                    /* argument */
     }
 
     for (i =0; i < num_threads - 1; i ++) {
