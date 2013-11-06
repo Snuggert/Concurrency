@@ -32,7 +32,7 @@ void *wave_thread(void *a){
 		}
 
 		data->next_array[i] = (2.0F * data->current_array[i]) -
-				data->old_array[i] + 0.2 * (data->current_array[prev] - 
+				data->old_array[i] + 0.2F * (data->current_array[prev] - 
 				(2.0F * data->current_array[i], data->current_array[next]));
 	}
 
