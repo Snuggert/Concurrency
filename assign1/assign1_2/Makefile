@@ -8,7 +8,7 @@ LFLAGS = -lm -lrt -lpthread
 
 all: $(PROGNAME)
 
-$(PROGNAME): $(OBJFILES)
+$(PROGNAME): $(PROGNAME).c
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 
 %.o: %.c
