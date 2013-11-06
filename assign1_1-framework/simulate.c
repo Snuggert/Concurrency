@@ -140,5 +140,8 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     // This is where the loop for time t ends.
     
     /* You should return a pointer to the array with the final results. */
+    // This is also where we free our globals that are not returned.
+    free(data.next_array);
+    free(data.old_array);
     return data.current_array;
 }
