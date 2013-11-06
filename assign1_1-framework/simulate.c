@@ -69,7 +69,6 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
 
-
     int master_size;
     int worker_size;
     /*
@@ -103,9 +102,6 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 	}
 
     printf("worker_size: %d\n", data.worker_size);
-
-
-
 
     /* You should return a pointer to the array with the final results. */
     return current_array;
