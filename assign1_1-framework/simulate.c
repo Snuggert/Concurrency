@@ -94,7 +94,9 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     void * results [ num_threads ];
 
     int i;
-    for (i =0; i < num_threads ; i ++) {
+    for (i =0; i < num_threads ; i ++) {4
+    	( struct Args ) malloc ( sizeof ( struct Args ));
+
         struct Args arg= malloc (sizeof(Args));
         arg.begin = worker_size * i;
         arg.size = worker_size;
