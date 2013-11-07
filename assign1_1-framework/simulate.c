@@ -21,12 +21,12 @@ struct Data
 
 struct Data data;
 
-typedef struct Args
+struct Args
 {
     int begin;
     int size;
     int id;
-}Args;
+};
 
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
@@ -34,6 +34,8 @@ void *wave_thread(void *a){
 	// int thread_id =  (unsigned int)pthread_self();
 
 	printf("thread id %d\n", args->id);
+	printf("thread size %d\n", args->size);
+	printf("thread begin %d\n", args->begin);
 
 	int prev;
 	int next;
@@ -75,7 +77,6 @@ void *wave_thread(void *a){
 double *simulate(const int i_max, const int t_max, const int num_threads,
         double *old_array, double *current_array, double *next_array)
 {
-
     int master_size;
     int worker_size;
     /*
@@ -94,13 +95,11 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
     void * results [ num_threads ];
 
     int i;
-    for (i =0; i < num_threads ; i ++) {4
-    	( struct Args ) malloc ( sizeof ( struct Args ));
-
-        struct Args arg= malloc (sizeof(Args));
-        arg.begin = worker_size * i;
-        arg.size = worker_size;
-        arg.id = i;
+    for (i =0; i < num_threads - 1; i ++) {
+        struct Args* arg = (struct Args*)malloc(sizeof(struct Args));
+        arg->begin = worker_size * i;
+        arg->size = worker_size;
+        arg->id = i;
         printf("created %d\n", i);
         pthread_create ( & thread_ids [i] , /* returned thread ids */
                 NULL ,                      /* default attributes */
@@ -108,9 +107,13 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
                 &arg);                    /* argument */
     }
 
-    for (i =0; i < num_threads ; i ++) {
-        pthread_join ( thread_ids [i], & results [i ]);
-        printf("joined %d\n", i);
+    for (i =0; i < num_threads - 1; i ++) {
+        if(pthread_join ( thread_ids [i], & results [i ]) == 0){
+            printf("joined %d\n", i);           
+        }
+        else{
+            printf("shit got fucked: %d\n", i);
+        }
     }
     
     /* You should return a pointer to the array with the final results. */
