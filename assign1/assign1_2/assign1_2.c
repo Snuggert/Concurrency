@@ -14,26 +14,27 @@ int main(int argc, char *argv[])
     long i;
     bool no_prime;
 
-    long* primes = malloc(12 * sizeof(long));
+    long* primes;
+    primes = malloc(prime_size * sizeof(long));
     primes[0] = 2;
     printf("%ld\n", 2);
     do{
         for(i = 0; i < number_of_primes; i++){
             if(number % primes[i] == 0){
-                break;
                 no_prime = true;
+                break;
             }
         }
         if(no_prime == false){
-            printf("%ld,", number);
-            primes[number_of_primes] = number;
-            number_of_primes ++;
-            if(number_of_primes == prime_size){
+            if(number_of_primes >= prime_size){
                 primes = realloc(primes, 2*prime_size*sizeof(long));
                 prime_size = prime_size * 2;
             }
+            printf("%ld,", number);
+            primes[number_of_primes] = number;
+            number_of_primes ++;
         }
         no_prime = false;
         number++;
-    }while(true);
+    }while(number < 1000);
 }

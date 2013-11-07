@@ -143,5 +143,7 @@ int main(int argc, char *argv[])
 
     file_write_double_array("result.txt", current, i_max);
 
+    // free(old);
+
     return EXIT_SUCCESS;
 }
