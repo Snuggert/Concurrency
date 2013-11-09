@@ -26,7 +26,7 @@ long queue_dequeue(queue_t * queue){
 // inputted number. If a number is not divisible you send it to the output queue
 // which is connected with the input queue of the next thread.
 void *check_number(void *a){
-
+    printf("new prime number: %d", a->prime);
 }
 
 int main(int argc, char *argv[]){
