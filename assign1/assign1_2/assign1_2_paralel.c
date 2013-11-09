@@ -45,19 +45,19 @@ queue_t init_queue(long max_size){
  * which is connected with the input queue of the next thread.
  */
 void *check_number(void *a){
-    struct queue_t *inbound_queue = (struct queue_t*)a;
+    queue_t *inbound_queue = (queue_t*)a;
 
     queue_t *outbound_queue;
 
     long prime = queue_dequeue(inbound_queue);
-    printf("new prime number: %d", prime);
+    printf("new prime number: %ld", prime);
 
     long nat_number = 0;
     int newThread = 0;
 
     /* Search for the first prime to initizalize child with. */
     while(!newThread){
-        nat_number = queue_dequeue(queue);
+        nat_number = queue_dequeue(inbound_queue);
         if(nat_number % prime != 0){
             newThread = 1; 
             outbound_queue = init_queue(nat_number);
@@ -73,7 +73,7 @@ void *check_number(void *a){
 
     /* Keep filtering all the numbers from the previous queue. */
     while(1){
-        nat_number = queue_dequeue(queue);
+        nat_number = queue_dequeue(inbound_queue);
         if(nat_number % prime != 0){
             queue_enqueue(outbound_queue, nat_number);
         }        
