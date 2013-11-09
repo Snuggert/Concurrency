@@ -104,7 +104,7 @@ void *check_number(void *a){
     pthread_create ( &thread,               /* returned thread ids */
                     NULL ,                  /* default attributes */
                     &check_number ,         /* start routine */
-                    &outbound_queue);       /* Que argument */
+                    outbound_queue);       /* Que argument */
 
     /* Keep filtering all the numbers from the previous queue. */
     while(1){
