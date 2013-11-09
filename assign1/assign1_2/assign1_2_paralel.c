@@ -51,7 +51,8 @@ long queue_dequeue(queue_t * queue){
 }
 
 queue_t *init_queue(long max_size){
-    queue_t *queue = malloc(sizeof(queue_t));
+    queue_t *queue;
+    queue = malloc(sizeof(queue_t));
 
     queue->buffer = malloc(sizeof(long) * max_size);
     queue->size = 0;
@@ -121,10 +122,10 @@ int main(int argc, char *argv[]){
     queue_t *outbound_queue = init_queue(max_queue_size);
     queue_enqueue(outbound_queue, n);
 
-    pthread_create ( &thread_one,           /* returned thread ids */
+    pthread_create (&thread_one,           /* returned thread ids */
                     NULL ,                  /* default attributes */
                     &check_number ,         /* start routine */
-                    &outbound_queue);       /* args to be further specified. */
+                    outbound_queue);       /* args to be further specified. */
     
     do{
         n += 2;
