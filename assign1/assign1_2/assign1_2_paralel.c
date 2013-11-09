@@ -22,12 +22,12 @@ typedef struct{
 }queue_t;
 
 /* Put new value in queue. */
-void queue_enqueue(queue_t *queue, long *value){
+void queue_enqueue(queue_t *queue, long value){
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == queue->max_size){
         pthread_cond_wait(&(queue->full), &(queue->mutex));
     }
-    queue->buffer[index] = value;
+    queue->buffer[queue->index] = value;
     queue->size ++;
     queue->index ++;
     queue->index %= queue->max_size;
@@ -59,9 +59,9 @@ queue_t *init_queue(long max_size){
     queue->index = 0;
     queue->outdex = 0;
 
-    queue->mutex = PTHREAD_MUTEX_INITIALIZER;
-    queue->full = PTHREAD_COND_INITIALIZER;
-    queue->empty = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_init(&queue->mutex, NULL);
+    pthread_cond_init(&queue->full, NULL);
+    pthread_cond_init(&queue->empty, NULL);
 
     return queue;
 }
@@ -88,7 +88,7 @@ void *check_number(void *a){
         if(nat_number % prime != 0){
             newThread = 1; 
             outbound_queue = init_queue(max_queue_size);
-            queue_enqueue(outbound_queue, &nat_number);
+            queue_enqueue(outbound_queue, nat_number);
         }
     }
 
@@ -103,7 +103,7 @@ void *check_number(void *a){
     while(1){
         nat_number = queue_dequeue(inbound_queue);
         if(nat_number % prime != 0){
-            queue_enqueue(outbound_queue, &nat_number);
+            queue_enqueue(outbound_queue, nat_number);
         }        
     }
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]){
     long n = 3;
     pthread_t thread_one;
     queue_t *outbound_queue = init_queue(max_queue_size);
-    queue_enqueue(outbound_queue, &n);
+    queue_enqueue(outbound_queue, n);
 
 
     pthread_create ( &thread_one,           /* returned thread ids */
@@ -123,8 +123,6 @@ int main(int argc, char *argv[]){
     
     do{
         n += 2;
-        queue_enqueue(outbound_queue, &n);
-    }while(1);
-    queue_t *queue = init_queue(10);
-
+        queue_enqueue(outbound_queue, n);
+    }while(true);
 }
