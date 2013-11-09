@@ -1,8 +1,8 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <pthread.h>
 #include <limits.h>
 #include <stdbool.h>
 
@@ -114,7 +114,6 @@ int main(int argc, char *argv[]){
     pthread_t thread_one;
     queue_t *outbound_queue = init_queue(max_queue_size);
     queue_enqueue(outbound_queue, &n);
-
 
     pthread_create ( &thread_one,           /* returned thread ids */
                     NULL ,                  /* default attributes */
