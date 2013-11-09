@@ -31,36 +31,21 @@ struct Args
 /* Add any functions you may need (like a worker) here. */
 void *wave_thread(void *a){
 	struct Args *arg = (struct Args*)a;
-	// int thread_id =  (unsigned int)pthread_self();
 
-	// printf("thread begin %d\nthread size %d\nthread id %d\n", arg->begin, 
-		// arg->size, arg->id);
+	/* Constant c that defines the spatial impact. */
+	float c = 0.2;
 
-	int prev;
-	int next;
-
+	/* Do all iterations assigned to the worker thread. */
 	for(int i = arg->begin; i < (arg->size + arg->begin); i++){
-		if(i <= 0){
-			// printf("%d\n", data.current_array[i]);
-			prev = data.i_max;
+		/* First and last iterations should be 0; */
+		if(i <= 0 || i == data.i_max - 2){
+			data.next_array[i] = 0;
 		}else{
-			prev = i;
+			data.next_array[i] = (2.0 * data.current_array[i]) - data.old_array[i] +
+					(c * (data.current_array[i-1] - (2.0 * data.current_array[i]) + 
+					data.current_array[i+1]));
 		}
-		// printf("henk %d\n", data.i_max);
-		if(i == data.i_max -1){
-			next = 0;
-			printf("henk");
-		}else{
-			next = i;
-		}
-
-		data.next_array[i] = (2.0F * data.current_array[i]) -
-				data.old_array[i] + 0.2F * (data.current_array[prev] - 
-				(2.0F * data.current_array[i], data.current_array[next]));
-
-		// printf("data: %f\n", data.next_array[i]);
 	}
-
 
 	return NULL;
 }
@@ -88,7 +73,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 	 */
 	worker_size = (int)(i_max / num_threads);
 
-	// Fill up the global struct.
+	/* Fill up the global struct. */
 	data.old_array = old_array;
 	data.current_array = current_array;
 	data.next_array = next_array;
@@ -97,13 +82,13 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 	pthread_t thread_ids [ num_threads ];
 	void * results [ num_threads ];
 
-	// This is where the master threads args are defined.
+	/* This is where the master threads args are defined. */
 	struct Args master_arg;
 	master_arg.begin = workerthreads * worker_size;
 	master_arg.size = i_max - (workerthreads) * worker_size;
 	master_arg.id = workerthreads;
 
-	// This is where the args for the worker threads are defined.
+	/* This is where the args for the worker threads are defined. */
 	struct Args args[workerthreads];
 	for(i = 0; i < workerthreads; i++){
 		struct Args arg;
@@ -113,41 +98,39 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 		args[i] = arg;
 	}
 
-	// This is where the loop for time t starts.
+	/* This is where the loop for time t starts. */
 	for(t = 0; t < t_max; t++){
 		for (i =0; i < workerthreads; i++){
-			// printf("created %d\n", i);
 			pthread_create ( & thread_ids [i] ,	/* returned thread ids */
 					NULL ,						/* default attributes */
 					&wave_thread ,				/* start routine */
 					&args[i]);					/* argument */
 		}
 
-		// This is where the master_thread starts its own work.
+		/* This is where the master_thread starts its own work. */
 		wave_thread(&master_arg);
 
-		// This is where the master waits for all the threads to finish work on the 
-		// next_array.
+		/*
+		 *  This is where the master waits for all the threads to finish work on the 
+		 * next_array. */
 		for (i =0; i < workerthreads; i ++) {
 			if(pthread_join( thread_ids[i], &results[i]) == -1){
 				printf("Error joining thread %d\n", i);           
 			}
 
 		}
-		// This is where you switch current array to old_array and next_array to
-		// current_array.
-		// printf("%d \n", t);
-
+		/* 
+		 * This is where you switch current array to old_array and next_array to
+		 * current_array. */
 		double *tmp = data.old_array;
 		data.old_array = data.current_array;
 		data.current_array = data.next_array;
+
 		/* Reuse the old array */
 		data.next_array = tmp;
 	}
 	
 	/* You should return a pointer to the array with the final results. */
 	// This is also where we free our globals that are not returned.
-	// free(data.next_array);
-	// free(data.old_array);
 	return data.current_array;
 }
