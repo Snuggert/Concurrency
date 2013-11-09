@@ -16,23 +16,34 @@ typedef struct{
     pthread_cond_t empty;
 }queue_t;
 
-// Put new value in queue.
+/* Put new value in queue. */
 void queue_enqueue(queue_t *queue, long *value){
     pthread_mutex_lock(&(queue->mutex));
     while (queue->size == queue->max_size){
         pthread_cond_wait(&(queue->full), &(queue->mutex));
     }
-
 }
  
-// Get value from queue.
+/* Get value from queue. */
 long queue_dequeue(queue_t * queue){
-
+    return 1;
 }
 
-// This is where you check if a number is divisible by the threads first 
-// inputted number. If a number is not divisible you send it to the output queue
-// which is connected with the input queue of the next thread.
+queue_t init_queue(long max_size){
+    queue_t queue;
+
+    queue.buffer = malloc(sizeof(long) * max_size);
+    queue.size = 0;
+    queue.max_size = max_size;
+
+    return queue;
+}
+
+/* 
+ * This is where you check if a number is divisible by the threads first 
+ * inputted number. If a number is not divisible you send it to the output queue
+ * which is connected with the input queue of the next thread.
+ */
 void *check_number(void *a){
 
 }
@@ -41,11 +52,12 @@ int main(int argc, char *argv[]){
     long n = 3;
     pthread_t thread_one;
     pthread_create ( &thread_one,           /* returned thread ids */
-                    NULL ,                  /* default attributes */
+                    NULL ,                   default attributes 
                     &check_number ,          /* start routine */
                     // args to be further specified.);  
     do{
 
     }while(true)
+    queue_t queue = init_queue(10);
 
 }

@@ -1,4 +1,4 @@
-PROGNAME = assign1_2
+PROGNAME = assign1_2_paralel
 CC = gcc
 
 WARNFLAGS = -Wall -Werror-implicit-function-declaration -Wshadow \
