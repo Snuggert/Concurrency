@@ -9,11 +9,19 @@
 typedef struct{
     long *buffer;
     long size;
+    long max_size;
+
     pthread_mutex_t mutex;
+    pthread_cond_t full;
+    pthread_cond_t empty;
 }queue_t;
 
 // Put new value in queue.
-void queue_enqueue(queue_t *queue, void *value){
+void queue_enqueue(queue_t *queue, long *value){
+    pthread_mutex_lock(&(queue->mutex));
+    while (queue->size == queue->max_size){
+        pthread_cond_wait(&(queue->full), &(queue->mutex));
+    }
 
 }
  
