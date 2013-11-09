@@ -31,12 +31,12 @@ long queue_dequeue(queue_t * queue){
     return 1;
 }
 
-queue_t init_queue(long max_size){
-    queue_t queue;
+queue_t *init_queue(long max_size){
+    queue_t *queue = malloc(sizeof(struct queue_t *));
 
-    queue.buffer = malloc(sizeof(long) * max_size);
-    queue.size = 0;
-    queue.max_size = max_size;
+    queue->buffer = malloc(sizeof(long) * max_size);
+    queue->size = 0;
+    queue->max_size = max_size;
 
     return queue;
 }
@@ -100,6 +100,6 @@ int main(int argc, char *argv[]){
         n += 2;
         queue_enqueue(outbound_queue, &n);
     }while(1);
-    queue_t queue = init_queue(10);
+    queue_t *queue = init_queue(10);
 
 }
