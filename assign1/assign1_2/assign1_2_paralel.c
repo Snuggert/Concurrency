@@ -84,7 +84,7 @@ void *check_number(void *a){
     queue_t *outbound_queue;
 
     long prime = queue_dequeue(inbound_queue);
-    printf("new prime number: %ld", prime);
+    printf("new prime number: %ld\n", prime);
 
     long nat_number = 0;
     int newThread = 0;
