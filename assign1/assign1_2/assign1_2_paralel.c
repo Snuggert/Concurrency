@@ -6,6 +6,8 @@
 #include <limits.h>
 #include <stdbool.h>
 
+long max_queue_size = 10000;
+
 typedef struct{
     long *buffer;
     long size;
@@ -60,7 +62,8 @@ void *check_number(void *a){
         nat_number = queue_dequeue(inbound_queue);
         if(nat_number % prime != 0){
             newThread = 1; 
-            outbound_queue = init_queue(nat_number);
+            outbound_queue = init_queue(max_queue_size);
+            queue_enqueue(outbound_queue, &nat_number);
         }
     }
 
@@ -75,7 +78,7 @@ void *check_number(void *a){
     while(1){
         nat_number = queue_dequeue(inbound_queue);
         if(nat_number % prime != 0){
-            queue_enqueue(outbound_queue, nat_number);
+            queue_enqueue(outbound_queue, &nat_number);
         }        
     }
 
@@ -84,7 +87,8 @@ void *check_number(void *a){
 int main(int argc, char *argv[]){
     long n = 3;
     pthread_t thread_one;
-    queue_t *outbound_queue = init_queue(n);
+    queue_t *outbound_queue = init_queue(max_queue_size);
+    queue_enqueue(outbound_queue, &n);
 
 
     pthread_create ( &thread_one,           /* returned thread ids */
@@ -94,8 +98,8 @@ int main(int argc, char *argv[]){
     
     do{
         n += 2;
-        queue_enqueue(outbound_queue, n);
-    }while(true)
+        queue_enqueue(outbound_queue, &n);
+    }while(1);
     queue_t queue = init_queue(10);
 
 }
