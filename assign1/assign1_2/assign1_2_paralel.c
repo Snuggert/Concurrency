@@ -17,40 +17,41 @@ typedef struct{
     long outdex;
 
     pthread_mutex_t *mutex;
-    pthread_cond_t full;
-    pthread_cond_t empty;
+    pthread_cond_t  *full;
+    pthread_cond_t  *empty;
 }queue_t;
 
 /* Put new value in queue. */
 void queue_enqueue(queue_t *queue, long value){
     pthread_mutex_lock(queue->mutex);
     while (queue->size == queue->max_size){
-        pthread_cond_wait(&(queue->full), queue->mutex);
+        pthread_cond_wait(queue->full, queue->mutex);
     }
     queue->buffer[queue->index] = value;
     queue->size ++;
     queue->index ++;
     queue->index %= queue->max_size;
     pthread_mutex_unlock(queue->mutex);
-    pthread_cond_broadcast(&(queue->empty));
+    pthread_cond_broadcast(queue->empty);
 }
  
 /* Get value from queue. */
 long queue_dequeue(queue_t * queue){
     pthread_mutex_lock(queue->mutex);
-    while (queue->size == 0)
-        pthread_cond_wait(&(queue->empty), queue->mutex);
+    while (queue->size == 0){
+        pthread_cond_wait(queue->empty, queue->mutex);
+    }
     long value = queue->buffer[queue->outdex];
     queue->size --;
     queue->outdex ++;
     queue->outdex %= queue->max_size;
     pthread_mutex_unlock(queue->mutex);
-    pthread_cond_broadcast(&(queue->full));
+    pthread_cond_broadcast(queue->full);
     return value;
 }
 
 queue_t *init_queue(long max_size){
-    queue_t *queue = malloc(sizeof(struct queue_t *));
+    queue_t *queue = malloc(sizeof(queue_t));
 
     queue->buffer = malloc(sizeof(long) * max_size);
     queue->size = 0;
@@ -62,8 +63,11 @@ queue_t *init_queue(long max_size){
     queue->mutex = malloc(sizeof(pthread_mutex_t));
     pthread_mutex_init(queue->mutex, NULL);
 
-    pthread_cond_init(&queue->full, NULL);
-    pthread_cond_init(&queue->empty, NULL);
+    queue->full = malloc(sizeof(pthread_cond_t));
+    pthread_cond_init(queue->full, NULL);
+
+    queue->empty = malloc(sizeof(pthread_cond_t));
+    pthread_cond_init(queue->empty, NULL);
 
     return queue;
 }
