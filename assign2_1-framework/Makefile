@@ -1,6 +1,6 @@
-PROGNAME = assign1_1
-SRCFILES = assign1_1.c file.c timer.c simulate.c
-TARNAME = assign1_1.tgz
+PROGNAME = assign2_1
+SRCFILES = assign2_1.c file.c timer.c simulate.c
+TARNAME = assign2_1.tgz
 
 # i_max t_max num_threads
 RUNARGS = 1000000 1000 1
