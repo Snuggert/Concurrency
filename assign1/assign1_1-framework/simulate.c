@@ -2,6 +2,9 @@
  * simulate.c
  *
  * Implement your (parallel) simulation here!
+ *
+ *
+ * Authors: Abe Wiersma, Bram van den Akker
  */
 
 #include <stdio.h>
@@ -118,8 +121,8 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 				printf("Error joining thread %d\n", i);           
 			}
 
-		}
-		/* 
+		
+}		/* 
 		 * This is where you switch current array to old_array and next_array to
 		 * current_array. */
 		double *tmp = data.old_array;
@@ -131,6 +134,7 @@ double *simulate(const int i_max, const int t_max, const int num_threads,
 	}
 	
 	/* You should return a pointer to the array with the final results. */
-	// This is also where we free our globals that are not returned.
+	/* This is also where we free our globals that are not returned. */
+
 	return data.current_array;
 }

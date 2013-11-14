@@ -50,7 +50,7 @@ void fill(double *array, int offset, int range, double sample_start,
 
 int main(int argc, char *argv[])
 {
-    double *old, *current, *next;
+    double *old, *current, *next, *balance;
     int t_max, i_max, num_threads;
     double time;
 
@@ -132,18 +132,33 @@ int main(int argc, char *argv[])
         fill(current, 2, i_max/4, 0, 2*3.14, sin);
     }
 
-    timer_start();
+    balance = malloc(10 * sizeof(double));
 
-    /* Call the actual simulation that should be implemented in simulate.c. */
-    simulate(i_max, t_max, num_threads, old, current, next);
+    t_max = 100000;
 
-    time = timer_end();
-    printf("Took %g seconds\n", time);
-    printf("Normalized: %g seconds\n", time / (i_max * t_max));
+    for(int j = 1000; j < 10000; j = (j * 10)){
+        // for(int q = 10; q < 100000; q = (q * 10)){
+            for(int i = 1; i <= 8; i++){
+                timer_start();
 
-    file_write_double_array("result.txt", current, i_max);
+                /* Call the actual simulation that should be implemented in simulate.c. */
+                simulate(j, t_max, i, old, current, next);
 
-    // free(old);
+                time = timer_end();
+                balance[i-1] = time; 
+
+                printf("%d \t\t %d \t %d \t %g\n", j, t_max, i, time);
+            }
+        // }// printf("Normalized: %g seconds\n", time / (i_max * t_max));
+    }
+
+
+
+    file_write_double_array("result.txt", balance, 8);
+
+    free(current);
+    free(old);
+    free(next);
 
     return EXIT_SUCCESS;
 }

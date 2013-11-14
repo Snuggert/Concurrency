@@ -122,6 +122,7 @@ int main(int argc, char *argv[]){
     queue_t *outbound_queue = init_queue(max_queue_size);
     queue_enqueue(outbound_queue, n);
 
+    printf("new prime number: %ld\n", n);
     pthread_create (&thread_one,           /* returned thread ids */
                     NULL ,                  /* default attributes */
                     &check_number ,         /* start routine */
