@@ -65,7 +65,7 @@ void *wave_thread(void *a){
  * current_array: array of size i_max filled with data for t
  * next_array: array of size i_max. You should fill this with t+1
  */
-double *simulate(const int i_max, const int t_max,
+double *simulate(const int i_max, const int t_max, const int num_threads,
 		double *old_array, double *current_array, double *next_array)
 {
 
@@ -76,8 +76,8 @@ double *simulate(const int i_max, const int t_max,
 
 		/* Do all iterations assigned to the worker thread. */
 		#pragma omp parallel for firstprivate ( next_array , current_array , \
-		 		old_array, i_max) lastprivate ( next_array , current_array , \
-		 		old_array) schedule ( static, 1 ) num_threads(8)
+		 		old_array) lastprivate ( next_array , current_array , \
+		 		old_array) schedule ( static, 1 ) num_threads(num_threads)
 		for(int i = 0; i < i_max; i++){
 			/* First and last iterations should be 0; */
 			if(i <= 0 || i == i_max - 2){

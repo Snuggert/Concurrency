@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     timer_start();
 
     /* Call the actual simulation that should be implemented in simulate.c. */
-    simulate(i_max, t_max, old, current, next);
+    simulate(i_max, t_max, num_threads, old, current, next);
     time = timer_end();
 
 
