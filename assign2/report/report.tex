@@ -28,28 +28,42 @@ Figure 3 shows the effects of chunk sizes on static scheduling. here you can see
  
 Figure 4 is actually pretty useless, the effect of the chunk size in guided scheduling is not relevant. The chunk size decreases each dispatch and the set chunk size will be ignored. 
 
-\begin{figure}
+\begin{figure}[h]
   \centering
     \includegraphics[width=\textwidth]{compare.png}
   \caption{1 to 8 cores with openmp vs pthreads}
 \end{figure}
 \break
-\begin{figure}
+\begin{figure}[h]
   \centering
     \includegraphics[width=\textwidth]{dynamic.png}
   \caption{1 to 8 cores with openmp and dynamic scheduling.}
 \end{figure}
 \break
-\begin{figure}
+\begin{figure}[h]
   \centering
     \includegraphics[width=\textwidth]{static.png}
   \caption{1 to 8 cores with openmp and static scheduling.}
 \end{figure}
 \break
-\begin{figure}
+\begin{figure}[h]
   \centering
     \includegraphics[width=\textwidth]{guided.png}
   \caption{1 to 8 cores with openmp and guided scheduling.}
+\end{figure}
+\break
+
+\section{Reduction operations}
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=\textwidth]{sum.png}
+  \caption{Sum with 1 to 8 cores}
+\end{figure}
+\break
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=\textwidth]{reduce.png}
+  \caption{Reduce with 1 to 8 cores}
 \end{figure}
 \break
 
