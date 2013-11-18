@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 
 double sum(double* vec, int len){
     int i; 
@@ -27,12 +29,18 @@ double reduce_function(double total, double reduction){
 
 int main(int argc, char *argv[])
 {
-    double *vec;
+    double *vec, totaltime;
+    int derp;
     vec = malloc(64 * sizeof(double));
     for(int i=0; i<64; i++){
         vec[i] = i;
     }
-    printf("%g\n", sum(vec, 64));
+    time_t start, end;
+    time(&start);
+    derp = sum(vec, 64);
+    end = time(&end);
+    totaltime = difftime(end,start);
+    printf("time: %g\n", totaltime);
 
     return 0;
 }
