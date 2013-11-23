@@ -57,8 +57,6 @@ int main(int argc, char *argv[])
         printf("Usage: %s i_max t_max num_threads [initial_data]\n", argv[0]);
         printf(" - i_max: number of discrete amplitude points, should be >2\n");
         printf(" - t_max: number of discrete timesteps, should be >=1\n");
-        printf(" - num_threads: number of threads to use for simulation, "
-                "should be >=1\n");
         printf(" - initial_data: select what data should be used for the first "
                 "two generation.\n");
         printf("   Available options are:\n");
