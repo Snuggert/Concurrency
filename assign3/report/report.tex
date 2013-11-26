@@ -22,6 +22,10 @@ This is done by MPI\_send's and MPI\_recv's, after this every process starts the
 In the simulation each process receives data from their left and right neighbor.
 After the simulation is done after t\_steps, the result is sent to the master process, where a non-blocking IRecv receives data into results. The master process waits until all results are received with a wait\_all.
 
+Despite the hard work we put in we did not bare the fruits of our labours, segfaults kept us from running on the das4,
+and on our local machines these same segfaults kept us from using more than 5 processes per node.
+We think the problem lies in mpi breaking the alloc's, and data being overwritten, but because in MPI it is hard to diagnose problems we just cannot be sure.
+
 \section{3.2 Collective communication}
 The collective communication assignment was fairly simple. We created three different broadcast methods. 
 
