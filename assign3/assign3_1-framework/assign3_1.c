@@ -50,8 +50,6 @@ void fill(double *array, int offset, int range, double sample_start,
 
 int main(int argc, char *argv[])
 {
-    float test1;
-    double test2;
     int myid, numprocs;
     MPI_Status status;
     MPI_Init(&argc, &argv);
@@ -61,6 +59,9 @@ int main(int argc, char *argv[])
 
     double *part_old, *part_current, *part_result, *result, time;
     int part_size, t_max, i_max;
+
+    i_max = 0;
+    result = NULL;
 
     // serial
     if(myid == 0){
@@ -139,6 +140,8 @@ int main(int argc, char *argv[])
             fill(current, 2, i_max/4, 0, 2*3.14, sin);
         }
 
+        /** MPI Part **/
+
         int index = 0;
         for(int i = 0; i < numprocs - 1; i++){
             part_size = ((i_max*i)+i_max) / numprocs - (i_max*i) 
@@ -162,8 +165,8 @@ int main(int argc, char *argv[])
         /* give master the last parts*/
         part_size = ((i_max*numprocs)+i_max) / numprocs - (i_max*numprocs) 
                     / numprocs;
-        part_old = calloc(part_size, sizeof(double));
-        part_current = calloc(part_size, sizeof(double));
+        part_old = calloc(part_size, sizeof(double*));
+        part_current = calloc(part_size, sizeof(double*));
         memcpy(part_old, old + index, part_size);
         memcpy(part_current, current + index, part_size);
 
@@ -176,8 +179,9 @@ int main(int argc, char *argv[])
         MPI_Recv(&part_size, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
         MPI_Recv(&t_max, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
 
-        part_old = calloc(part_size, sizeof(double));
-        part_current = calloc(part_size, sizeof(double));
+        part_old = calloc(part_size, sizeof(double*));
+        part_current = calloc(part_size, sizeof(double*));
+
         /* receive parts for processing */
         MPI_Recv(&part_old[0], part_size, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, 
                 &status);
