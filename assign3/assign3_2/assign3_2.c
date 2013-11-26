@@ -6,12 +6,6 @@
 
 #include "assign3_2.h"
 
-struct Buffer
-{
-	int data;
-	int cur_i;
-	int max_i;
-}; 
 
 /* Calculate the amount to source to the left */
 int left_steps_to_source(int id, int root, int world_size){
@@ -67,136 +61,103 @@ void my_bcast(void* buffer, int count, MPI_Datatype datatype, int root,
 /* Simple one way circle broadcast*/
 void my_bcast_circle_1_way(void* buffer, int count, MPI_Datatype datatype, int root,
 		MPI_Comm communicator) {
-	int myId, world_size;
+	int myId, world_size, send;
 	MPI_Comm_rank(communicator, &myId);
 	MPI_Comm_size(communicator, &world_size);
+	// int* buf = (int*)buffer;
+	// printf("%d\n", buf);
 
 	if(world_size < 2)
 		return;
+
+	send = (myId + 1) % (world_size);
+	if(send < 0){
+		send = world_size + send;
+	}
  
 	if (myId == root) {
-		if (myId == world_size - 1)
-			MPI_Send(buffer, count, datatype, 0, 0, communicator);
-		else
-			MPI_Send(buffer, count, datatype, root + 1, 0, communicator);
-		
-		// If we are the root process, send our data to everyone
+		MPI_Send(buffer, count, datatype, send, myId, communicator);
+		printf("[init]From %d to %d\n", myId, (myId + 1) % (world_size));
 
 	} else {
 		int recv;
-		if (myId - 1 != 0)
-			recv = myId - 1;
-		else
-			recv = 0;
 
-		MPI_Recv(buffer, count, datatype, recv, 0, communicator,
+		recv = (myId - 1) % (world_size);
+		if(recv < 0){
+			recv = world_size + recv;
+		}
+
+		MPI_Recv(buffer, count, datatype, recv, recv, communicator,
 				 MPI_STATUS_IGNORE);
 
-		/* If the next neighbor is not the root the message will be passed */
-		if(myId != world_size - 1 && myId + 1 != root)
-			MPI_Send(buffer, count, datatype, myId + 1, 0, communicator);
-		else if(root != 0)
-			MPI_Send(buffer, count, datatype, 0, 0, communicator);
-		
+		if(send != root){
+		 	MPI_Send(buffer, count, datatype, send, myId, communicator);
+			printf("[resend]From %d to %d\n", myId, send);
+		}
+
 	}
 }
 
 /* Complex two way circle broadcast*/
-void my_bcast_circle(void* buffer, int count, MPI_Datatype datatype, int root,
+void my_bcast_circle_2_way(void* buffer, int count, MPI_Datatype datatype, int root,
 		MPI_Comm communicator) {
-	int myId, world_size;
+	int myId, world_size, left_neighbor, right_neighbor;
+
 	MPI_Status status;
 	MPI_Comm_rank(communicator, &myId);
 	MPI_Comm_size(communicator, &world_size);
 
+
 	if(world_size < 2)
 		return;
 
- 
+	/* Calculate the left and right neighbors */
+	left_neighbor 	= (myId - 1) % (world_size);
+	if(left_neighbor < 0)
+		left_neighbor = world_size + left_neighbor;
+	right_neighbor 	= (myId + 1) % (world_size);
+
+
 	if (myId == root) {
-		if(myId == 0){
-			MPI_Send(buffer, count, datatype, root + 1, 0, communicator);
-			MPI_Send(buffer, count, datatype, world_size - 1, 0, communicator);
-			printf("world_size %d, root%d\n", world_size, root);
-		}else{
-			MPI_Send(buffer, count, datatype, myId - 1, 0, communicator);
-			if(myId != world_size - 1){
-				MPI_Send(buffer, count, datatype, myId + 1, 0, communicator);
-			}else{
-				MPI_Send(buffer, count, datatype, 0, 0, communicator);
-			}
-		}
+	 	/* If the thread is the root send to left and right neighbor */
+		MPI_Send(buffer, count, datatype, right_neighbor, 0, communicator);
+		MPI_Send(buffer, count, datatype, left_neighbor, 0, communicator);
 	} else {
-		// If we are a receiver process, receive the data from the root
+	 	/* 
+	 	 * If the thread is not the root send to left and right neighbor
+	 	 * when the maximum steps in that directions are not yet reached.
+	 	 */
+		
 		MPI_Recv(buffer, count, datatype, MPI_ANY_SOURCE, 0, communicator,
 				 &status);
 
 		int distance, max_distance;
-		// struct Buffer buffer_t = (struct Buffer) buffer;
+
 		printf("%d received from %d\n", myId, status.MPI_SOURCE);
 
 		/* Send to next neighbor */
-		if(status.MPI_SOURCE == myId - 1 && root != myId + 1 && myId != world_size -1){
+		if(status.MPI_SOURCE == right_neighbor && left_neighbor != root){
+			max_distance = max_right(world_size);
+			distance = right_steps_to_source(myId, root, world_size);
+			if (distance <= max_distance){
+				MPI_Send(buffer, count, datatype, left_neighbor, 0, communicator);	
+			}
+		}else if(status.MPI_SOURCE == left_neighbor && right_neighbor != root){
 			max_distance = (world_size/2)-1;
 			distance = left_steps_to_source(myId, root, world_size);
-				printf("11, %d, %d, %d\n", myId, distance, max_distance);
 			if (distance <= max_distance){
-				printf("1, %d, %d, %d\n", myId, distance, max_distance);
-				MPI_Send(buffer, count, datatype, myId + 1, 0, communicator);	
-			}
-		}else if(status.MPI_SOURCE == myId + 1 && root != myId - 1 && myId != 0){
-			max_distance = max_right(world_size);
-			distance = right_steps_to_source(myId, root, world_size);
-				printf("12, %d, %d, %d\n", myId, distance, max_distance);
-			if (distance <= max_distance){
-				printf("2, %d, %d, %d\n", myId, distance, max_distance);
-				MPI_Send(buffer, count, datatype, myId - 1, 0, communicator);	
-			}
-		}else if(status.MPI_SOURCE == world_size - 1 && root != 0){
-			max_distance = (world_size/2);
-			distance = right_steps_to_source(myId, root, world_size);
-				printf("13, %d\n", myId);
-			if (distance <= max_distance){
-				printf("3, %d\n", myId);
-				MPI_Send(buffer, count, datatype, 0, 0, communicator);
-			}
-		}else if(status.MPI_SOURCE == 0 && root != world_size - 2){
-			max_distance = max_right(world_size);
-			distance = right_steps_to_source(myId, root, world_size);
-				printf("14, %d, %d, %d\n", myId, distance, max_distance);
-			if (distance <= max_distance){
-				printf("4, %d, %d, %d\n", myId, distance, max_distance);
-				MPI_Send(buffer, count, datatype, world_size - 2, 0,
-						communicator);
-			}
-		}else if(myId - 1 < 0){
-			max_distance = max_right(world_size);
-			distance = right_steps_to_source(myId, root, world_size);
-			printf("15, %d, %d, %d\n", myId, distance, max_distance);
-			if (distance <= max_distance){
-				printf("5, %d, %d, %d\n", myId, distance, max_distance);
-				MPI_Send(buffer, count, datatype, world_size - 1, 0,
-						communicator);
-			}
-		}else if(myId == world_size - 1){
-			max_distance = (world_size/2);
-			distance = left_steps_to_source(myId, root, world_size);
-			printf("15, %d, %d, %d\n", myId, distance, max_distance);
-			if (distance <= max_distance){
-				printf("5, %d, %d, %d\n", myId, distance, max_distance);
-				MPI_Send(buffer, count, datatype, 0, 0,
-						communicator);
+				MPI_Send(buffer, count, datatype, right_neighbor, 0, communicator);	
 			}
 		}
-
 	}
 }
 
 int main(int argc, char *argv[]){
 	MPI_Init(NULL, NULL);
 
-	int myId, world_size, buffer, root;
-	root = 0;
+	int myId, world_size, root;
+	root = 5;
+	int buffer;
 
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myId);
@@ -210,13 +171,13 @@ int main(int argc, char *argv[]){
 	if (myId == root) {
 		buffer = 12;
 		printf("Process %d broadcasting data %d\n", root, buffer);
-		my_bcast_circle(&buffer, 1, MPI_INT, root, MPI_COMM_WORLD);
+		my_bcast_circle_2_way(&buffer, 1, MPI_INT, root, MPI_COMM_WORLD);
 	} else {
-		my_bcast_circle(&buffer, 1, MPI_INT, root, MPI_COMM_WORLD);
+		my_bcast_circle_2_way(&buffer, 1, MPI_INT, root, MPI_COMM_WORLD);
+		printf("Thread %d received value %d\n", myId, buffer);
 	}
 
 	MPI_Finalize();
-
 
 	return EXIT_SUCCESS;
 }
