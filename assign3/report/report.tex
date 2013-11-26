@@ -1,0 +1,32 @@
+\documentclass[10pt]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{capt-of}
+\title{\bfseries\Huge Bram van den Akker}
+
+\date{}
+\begin{document}
+\title{MPI}
+\author{Abe Wiersma, Bram van den Akker}
+\date{\today}
+\maketitle
+\newpage
+
+\section{Openmp vs pthreads vs MPI}
+
+
+\section{3.2 Collective communication}
+The collective communication assignment was fairly simple. We created three different broadcast methods. 
+
+\subsection{Simple broadcast}
+The simple broadcast has one root not which will send it's message to all the other nodes in the network. This is achieved the use of MPI\_Send and MPI\_Recv.
+\subsection{One way circle broadcast}
+To create a real peer to peer broadcast we used a circle broadcast. The root will send the message to it´s right neighbour, each neighbour will send the message to it´s right neighbour until the root is reached again. 
+\subsection{Two way circle broadcast}
+Improving the circle broadcast performance can be achieved by sending the message in two directions. The root will send the message to it´s left and right neighbours. When a node receives the message from one neighbour it will send the message to the neighbour on the other side. Mssages will only travel through one half of the circle. For an even amount of messages the messages per circle half can be calculated by $(world size / 2) - 1$, for uneven messages the right half will do send $(world size / 2)$ amount of messages.
+
+
+\end{document}
