@@ -55,12 +55,10 @@ int main(int argc, char *argv[])
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD,&myid);
     MPI_Comm_size(MPI_COMM_WORLD,&numprocs);
-    MPI_Request reqs[(numprocs - 1) * 2];
+    MPI_Request reqs[numprocs - 1];
 
     double *part_old, *part_current, *part_result, *result, time;
     int part_size, t_max, i_max;
-    printf("my id%d\n", myid);
-
     // serial
     if(myid == 0){
         double *old, *current;
@@ -186,7 +184,13 @@ int main(int argc, char *argv[])
 
     int left_neighbor, right_neighbor;
 
-    left_neighbor = abs(myid - 1) % numprocs;
+    left_neighbor = myid - 1;
+    if(left_neighbor < 0){
+        left_neighbor += numprocs;
+    }
+    else{
+        left_neighbor %= numprocs;
+    }
     right_neighbor = (myid + 1) % numprocs;
 
     // parallel
@@ -200,7 +204,7 @@ int main(int argc, char *argv[])
         /* copy results of masters work into result */
         memcpy(result + i_max - part_size, part_result, part_size);
         /* wait for all processes to complete writing to results */
-        MPI_Waitall((numprocs - 1) * 2, reqs, &status);
+        MPI_Waitall(numprocs - 1, &reqs[0], &status);
         
         time = timer_end();
         printf("Took %g seconds\n", time);
@@ -211,8 +215,7 @@ int main(int argc, char *argv[])
     }
     else{
         /* send results to master */
-        MPI_Isend(&part_result[0], part_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, 
-            &reqs[numprocs + myid - 2]);        
+        MPI_Send(&part_result[0], part_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);        
     }
 
     MPI_Finalize();
