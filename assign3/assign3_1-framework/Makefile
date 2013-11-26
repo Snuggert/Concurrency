@@ -4,7 +4,7 @@ TARNAME = assign3_1.tgz
 
 RUNARGS = 1000 1000 # i_max t_max, increase this when testing on the DAS4!
 NODES = 1 # How many DAS4 nodes
-PROCESSESPERNODE = 6 # How many processes to spawn on one machine.
+PROCESSESPERNODE = 10 # How many processes to spawn on one machine.
 
 PRUNARGS = -v -np $(NODES) -$(PROCESSESPERNODE) \
 		   -sge-script $$PRUN_ETC/prun-openmpi
@@ -33,7 +33,7 @@ run: $(PROGNAME)
 	prun $(PRUNARGS) $(PROGNAME) $(RUNARGS)
 
 runlocal: $(PROGNAME)
-	mpirun -n $(PROCESSESPERNODE) ./$(PROGNAME) $(RUNARGS)
+	mpirun -n $(PROCESSESPERNODE) valgrind ./$(PROGNAME) $(RUNARGS)
 
 plot: result.txt
 	gnuplot plot.gnp

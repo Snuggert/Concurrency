@@ -64,5 +64,7 @@ double *simulate(const int i_max, const int t_max, double *old_array,
         memcpy(current_array, next_array, i_max);
     }
     memcpy(next_array, current_array, i_max);
+    free(current_array);
+    free(old_array);
     return next_array;    
 }
