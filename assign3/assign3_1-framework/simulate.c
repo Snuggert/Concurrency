@@ -60,14 +60,9 @@ double *simulate(const int i_max, const int t_max, double *old_array,
                     (c * (current_array[left_index] - (2.0 * current_array[i]) + 
                     current_array[right_index]));
         }
-        memcpy(old_array, current_array + 1, i_max);
-        memcpy(current_array + 1, next_array, i_max);
+        memcpy(old_array, current_array, i_max);
+        memcpy(current_array, next_array, i_max);
     }
-    memcpy(next_array, current_array + 1, i_max);
-    if(left_neighbor + 1 == 1){
-        for(int j = 0; j < i_max; j ++){
-            printf("Index[%d]: %g\n", j, next_array[j]);
-        }
-    }
+    memcpy(next_array, current_array, i_max);
     return next_array;    
 }
