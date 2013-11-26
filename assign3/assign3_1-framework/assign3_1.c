@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
             part_size = ((i_max*i)+i_max) / numprocs - (i_max*i) 
                     / numprocs;
 
-            /* send sizes and the part of old array */
+            /* send size of the part and the part of old array */
             MPI_Send(&part_size, 1, MPI_INT, i + 1, 0, MPI_COMM_WORLD);
             MPI_Send(&t_max, 1, MPI_INT, i + 1, 1, MPI_COMM_WORLD);
             MPI_Send(&old[index], part_size, MPI_DOUBLE, i + 1, 2, 
@@ -162,19 +162,20 @@ int main(int argc, char *argv[])
             index += part_size;
         }
 
-        /* give master the last parts*/
+        /* give master the last part*/
         part_size = ((i_max*numprocs)+i_max) / numprocs - (i_max*numprocs) 
                     / numprocs;
         part_old = calloc(part_size, sizeof(double*));
         part_current = calloc(part_size, sizeof(double*));
+
         memcpy(part_old, old + index, part_size);
         memcpy(part_current, current + index, part_size);
-
+        
         free(old);
         free(current);
+        
         timer_start();
-    }
-    else{
+    } else{
         /* receive t and part_size */
         MPI_Recv(&part_size, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
         MPI_Recv(&t_max, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, &status);
@@ -190,26 +191,23 @@ int main(int argc, char *argv[])
     }
 
     int left_neighbor, right_neighbor;
-
     left_neighbor = myid - 1;
     if(left_neighbor < 0){
         left_neighbor += numprocs;
-    }
-    else{
+    } else{
         left_neighbor %= numprocs;
     }
     right_neighbor = (myid + 1) % numprocs;
 
-    // parallel
     /* Call the actual simulation that should be implemented in simulate.c. */
     part_result = calloc(part_size, sizeof(double));
     part_result = simulate(part_size, t_max, part_old, part_current,
             part_result, left_neighbor, right_neighbor, status);
 
-    // serial
     if(myid == 0){
         /* copy results of masters work into result */
         memcpy(result + i_max - part_size, part_result, part_size);
+
         /* wait for all processes to complete writing to results */
         MPI_Waitall(numprocs - 1, &reqs[0], &status);
         
@@ -218,13 +216,11 @@ int main(int argc, char *argv[])
         printf("Normalized: %g seconds\n", time / (1. * i_max * t_max));
 
         file_write_double_array("result.txt", result, i_max);
-
-    }
-    else{
+    } else{
         /* send results to master */
-        MPI_Send(&part_result[0], part_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);        
+        MPI_Send(&part_result[0], part_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     }
-
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
+
