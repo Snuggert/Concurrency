@@ -33,7 +33,7 @@ run: $(PROGNAME)
 	prun $(PRUNARGS) $(PROGNAME) $(RUNARGS)
 
 runlocal: $(PROGNAME)
-	mpirun -n $(PROCESSESPERNODE) valgrind ./$(PROGNAME) $(RUNARGS)
+	mpirun -n $(PROCESSESPERNODE) ./$(PROGNAME) $(RUNARGS)
 
 plot: result.txt
 	gnuplot plot.gnp

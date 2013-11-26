@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
         /* send results to master */
         MPI_Send(&part_result[0], part_size, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
     }
-    printf("We get here\n");
     MPI_Finalize();
     return EXIT_SUCCESS;
 }
+
