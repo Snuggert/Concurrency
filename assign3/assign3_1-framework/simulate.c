@@ -48,7 +48,6 @@ double *simulate(const int i_max, const int t_max, double *old_array,
                 MPI_COMM_WORLD, &status);
 
         for(int i = 0; i < i_max; i++){
-            /* First and last iterations should be 0; */
             next_array[i] = (2.0 * current_array[i+1]) - old_array[i] +
                     (c * (current_array[i] - (2.0 * current_array[i+1]) + 
                     current_array[i+2]));

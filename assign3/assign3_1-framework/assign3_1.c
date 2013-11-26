@@ -184,7 +184,13 @@ int main(int argc, char *argv[])
 
     int left_neighbor, right_neighbor;
 
-    left_neighbor = abs(myid - 1) % numprocs;
+    left_neighbor = myid - 1;
+    if(left_neighbor < 0){
+        left_neighbor += numprocs;
+    }
+    else{
+        left_neighbor %= numprocs;
+    }
     right_neighbor = (myid + 1) % numprocs;
 
     // parallel
