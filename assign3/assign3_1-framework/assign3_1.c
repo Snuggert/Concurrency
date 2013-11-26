@@ -163,8 +163,8 @@ int main(int argc, char *argv[])
         part_size = ((i_max*numprocs)+i_max) / numprocs - (i_max*numprocs) 
                     / numprocs;
         part_old = calloc(part_size, sizeof(double));
-        memcpy(part_old, old + index, part_size);
         part_current = calloc(part_size, sizeof(double));
+        memcpy(part_old, old + index, part_size);
         memcpy(part_current, current + index, part_size);
 
         free(old);
