@@ -50,6 +50,8 @@ void fill(double *array, int offset, int range, double sample_start,
 
 int main(int argc, char *argv[])
 {
+    float test1;
+    double test2;
     int myid, numprocs;
     MPI_Status status;
     MPI_Init(&argc, &argv);
@@ -59,6 +61,7 @@ int main(int argc, char *argv[])
 
     double *part_old, *part_current, *part_result, *result, time;
     int part_size, t_max, i_max;
+
     // serial
     if(myid == 0){
         double *old, *current;
@@ -159,9 +162,9 @@ int main(int argc, char *argv[])
         /* give master the last parts*/
         part_size = ((i_max*numprocs)+i_max) / numprocs - (i_max*numprocs) 
                     / numprocs;
-        part_old = (double *)calloc(part_size, sizeof(double));
+        part_old = calloc(part_size, sizeof(double));
         memcpy(part_old, old + index, part_size);
-        part_current = (double *)calloc(part_size, sizeof(double));
+        part_current = calloc(part_size, sizeof(double));
         memcpy(part_current, current + index, part_size);
 
         free(old);
@@ -192,7 +195,7 @@ int main(int argc, char *argv[])
 
     // parallel
     /* Call the actual simulation that should be implemented in simulate.c. */
-    part_result = (double *)calloc(part_size, sizeof(double));
+    part_result = calloc(part_size, sizeof(double));
     part_result = simulate(part_size, t_max, part_old, part_current,
             part_result, left_neighbor, right_neighbor, status);
 
