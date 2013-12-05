@@ -220,9 +220,9 @@ int main(int argc, char* argv[]) {
     }
 
     /* Allocate and initialize buffers. */
-    old = malloc(i_max * sizeof(float));
-    current = malloc(i_max * sizeof(float));
-    next = malloc(i_max * sizeof(float));
+    old = new float[i_max];
+    current = new float[i_max];
+    next = new float[i_max];
 
     if (old == NULL || current == NULL || next == NULL) {
         fprintf(stderr, "Could not allocate enough memory, aborting.\n");
