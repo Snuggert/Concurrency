@@ -13,7 +13,7 @@
 /*
  * Reads at most n doubles from a given file into an array.
  */
-void file_read_float_array(const char *filename, float *array, int n)
+void file::file_read_float_array(const char *filename, float *array, int n)
 {
     FILE *fp;
     int i;
@@ -39,7 +39,7 @@ void file_read_float_array(const char *filename, float *array, int n)
  * Saves an array with n items to a given file, overwriting any previous
  * contents.
  */
-void file_write_float_array(const char *filename, float *array, int n)
+void file::file_write_float_array(const char *filename, float *array, int n)
 {
     FILE *fp;
     int i;
