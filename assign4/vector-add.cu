@@ -180,8 +180,8 @@ void vectorAddCuda(int n, float* a, float* b, float* result) {
 
 int main(int argc, char* argv[]) {
     float *old, *current, *next;
+    timer vectorAddTimer("vector add timer");
     int t_max, i_max, num_threads;
-    double time;
 
     /* Parse commandline args: i_max t_max num_threads */
     if (argc < 4) {
@@ -249,8 +249,8 @@ int main(int argc, char* argv[]) {
                 printf("No files specified!\n");
                 exit(1);
             }
-            file_read_double_array(argv[5], old, i_max);
-            file_read_double_array(argv[6], current, i_max);
+            file_read_float_array(argv[5], old, i_max);
+            file_read_float_array(argv[6], current, i_max);
         } else {
             printf("Unknown initial mode: %s.\n", argv[4]);
             exit(1);
