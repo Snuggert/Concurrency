@@ -63,7 +63,7 @@ __global__ void waveStep(int N, float* old, float* current, float* next){
     }
 }
 
-void simulateCuda(int n, float* old, float* current, float* next){
+void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     int threadBlockSize = 512;
 
     // allocate the vectors on the GPU
@@ -92,19 +92,24 @@ void simulateCuda(int n, float* old, float* current, float* next){
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
+    for(int i = 0; i < max_t; i++){
 
-    // copy the original vectors to the GPU
-    checkCudaCall(cudaMemcpy(deviceOld, old, n*sizeof(float), cudaMemcpyHostToDevice));
-    checkCudaCall(cudaMemcpy(deviceCurrent, current, n*sizeof(float), cudaMemcpyHostToDevice));
+        // copy the original vectors to the GPU
+        checkCudaCall(cudaMemcpy(deviceOld, old, n*sizeof(float), cudaMemcpyHostToDevice));
+        checkCudaCall(cudaMemcpy(deviceCurrent, current, n*sizeof(float), cudaMemcpyHostToDevice));
 
-    // execute kernel
-    cudaEventRecord(start, 0);
-    vectorAddKernel<<<n/threadBlockSize, threadBlockSize>>>(deviceOld, deviceCurrent, deviceNext);
-    cudaEventRecord(stop, 0);
+        // execute kernel
+        cudaEventRecord(start, 0);
+        vectorAddKernel<<<n/threadBlockSize, threadBlockSize>>>(deviceOld, deviceCurrent, deviceNext);
+        cudaEventRecord(stop, 0);
 
-    // check whether the kernel invocation was successful
-    checkCudaCall(cudaGetLastError());
+        // check whether the kernel invocation was successful
+        checkCudaCall(cudaGetLastError());
 
+        /* Copy results to old and current */
+        checkCudaCall(cudaMemcpy(deviceOld, deviceCurrent, n*sizeof(float), cudaMemcpyDeviceToDevice));
+        checkCudaCall(cudaMemcpy(deviceCurrent, deviceNext, n*sizeof(float), cudaMemcpyDeviceToDevice));
+    }
     // copy result back
     checkCudaCall(cudaMemcpy(next, deviceNext, n * sizeof(float), cudaMemcpyDeviceToHost));
 
