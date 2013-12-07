@@ -269,7 +269,7 @@ int main(int argc, char* argv[]) {
     }
 
     vectorAddTimer.start();
-    simulateCuda(i_max, t_max, old, current, next);
+    vectorAddCuda(i_max, old, current, next);
     vectorAddTimer.stop();
 
     cout << vectorAddTimer;
