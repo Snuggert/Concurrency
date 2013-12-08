@@ -126,12 +126,10 @@ int main(int argc, char* argv[]) {
     int t_max, i_max, num_threads;
 
     /* Parse commandline args: i_max t_max num_threads */
-    if (argc < 4) {
+    if (argc < 3) {
         printf("Usage: %s i_max t_max num_threads [initial_data]\n", argv[0]);
         printf(" - i_max: number of discrete amplitude points, should be >2\n");
         printf(" - t_max: number of discrete timesteps, should be >=1\n");
-        printf(" - num_threads: number of threads to use for simulation, "
-                "should be >=1\n");
         printf(" - initial_data: select what data should be used for the first "
                 "two generation.\n");
         printf("   Available options are:\n");
@@ -146,7 +144,6 @@ int main(int argc, char* argv[]) {
 
     i_max = atoi(argv[1]);
     t_max = atoi(argv[2]);
-    num_threads = atoi(argv[3]);
 
     if (i_max < 3) {
         printf("argument error: i_max should be >2.\n");
@@ -154,10 +151,6 @@ int main(int argc, char* argv[]) {
     }
     if (t_max < 1) {
         printf("argument error: t_max should be >=1.\n");
-        exit(1);
-    }
-    if (num_threads < 1) {
-        printf("argument error: num_threads should be >=1.\n");
         exit(1);
     }
 
@@ -176,23 +169,23 @@ int main(int argc, char* argv[]) {
     memset(next, 0, i_max * sizeof(float));
 
     /* How should we will our first two generations? */
-    if (argc > 4) {
-        if (strcmp(argv[4], "sin") == 0) {
+    if (argc > 3) {
+        if (strcmp(argv[3], "sin") == 0) {
             fill(old, 1, i_max/4, 0, 2*3.14, sin);
             fill(current, 2, i_max/4, 0, 2*3.14, sin);
-        } else if (strcmp(argv[4], "sinfull") == 0) {
+        } else if (strcmp(argv[3], "sinfull") == 0) {
             fill(old, 1, i_max-2, 0, 10*3.14, sin);
             fill(current, 2, i_max-3, 0, 10*3.14, sin);
-        } else if (strcmp(argv[4], "gauss") == 0) {
+        } else if (strcmp(argv[3], "gauss") == 0) {
             fill(old, 1, i_max/4, -3, 3, gauss);
             fill(current, 2, i_max/4, -3, 3, gauss);
-        } else if (strcmp(argv[4], "file") == 0) {
+        } else if (strcmp(argv[3], "file") == 0) {
             if (argc < 7) {
                 printf("No files specified!\n");
                 exit(1);
             }
-            file_read_float_array(argv[5], old, i_max);
-            file_read_float_array(argv[6], current, i_max);
+            file_read_float_array(argv[4], old, i_max);
+            file_read_float_array(argv[5], current, i_max);
         } else {
             printf("Unknown initial mode: %s.\n", argv[4]);
             exit(1);
