@@ -123,11 +123,11 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
 int main(int argc, char* argv[]) {
     float *old, *current, *next;
     timer vectorAddTimer("vector add timer");
-    int t_max, i_max, num_threads;
+    int t_max, i_max;
 
-    /* Parse commandline args: i_max t_max num_threads */
+    /* Parse commandline args: i_max t_max */
     if (argc < 3) {
-        printf("Usage: %s i_max t_max num_threads [initial_data]\n", argv[0]);
+        printf("Usage: %s i_max t_max [initial_data]\n", argv[0]);
         printf(" - i_max: number of discrete amplitude points, should be >2\n");
         printf(" - t_max: number of discrete timesteps, should be >=1\n");
         printf(" - initial_data: select what data should be used for the first "
