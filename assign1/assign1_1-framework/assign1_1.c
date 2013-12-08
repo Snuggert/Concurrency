@@ -134,22 +134,18 @@ int main(int argc, char *argv[])
 
     balance = malloc(10 * sizeof(double));
 
-    t_max = 100000;
+    t_max = 1000;
 
-    for(int j = 1000; j < 10000; j = (j * 10)){
-        // for(int q = 10; q < 100000; q = (q * 10)){
-            for(int i = 1; i <= 8; i++){
-                timer_start();
+    for(int j = 1000; j < 10000000; j = (j * 10)){
+        timer_start();
 
-                /* Call the actual simulation that should be implemented in simulate.c. */
-                simulate(j, t_max, i, old, current, next);
+        /* Call the actual simulation that should be implemented in simulate.c. */
+        simulate(j, t_max, 1, old, current, next);
 
-                time = timer_end();
-                balance[i-1] = time; 
+        time = timer_end();
+        balance[i-1] = time; 
 
-                printf("%d \t\t %d \t %d \t %g\n", j, t_max, i, time);
-            }
-        // }// printf("Normalized: %g seconds\n", time / (i_max * t_max));
+        printf("%g", time);
     }
 
 
