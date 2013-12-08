@@ -46,17 +46,30 @@ static void checkCudaCall(cudaError_t result) {
     }
 }
 
-__global__ void cudaMax(int N, int gap, float* values){
-    unsigned i = (blockIdx.x * blockDim.x + threadIdx.x) * (2 * gap);
-    if ((i + gap) < N){
-        values[i] = (values[i] < values[i + gap]) ? values[i + gap] : values[i];
+__global__ void cudaMax(int size, int gap, float* values){
+    unsigned i = blockIdx.x * blockDim.x + threadIdx.x;
+    if( ( (gap + i) < size) &&  values[gap + i] > values[i]){
+	values[i] = values[gap + i];
     }
 }
 
-void calculateMax(int n, float* values){
+float max_value(int size, float* values){
+    int max = 0; 
+    for(int i = 0; i < size; i++){
+	if(values[i] > max){
+	    max = values[i];
+        }
+    }
+
+    return max;
+}
+
+
+void calculateMax(int size, float* values){
     int threadBlockSize = 512;
-    int gap = 0;
+    int gap = 1;
     float max = 0;
+    int n = size; 
 
     // allocate the vectors on the GPU
     float* deviceValues = NULL;
@@ -69,27 +82,26 @@ void calculateMax(int n, float* values){
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
+    checkCudaCall(cudaMemcpy(deviceValues, values, n*sizeof(float), cudaMemcpyHostToDevice));
+    
     while(n != 1){
         n = n/2;
 
         // copy the original vectors to the GPU
-        checkCudaCall(cudaMemcpy(deviceValues, values, n*sizeof(float), cudaMemcpyHostToDevice));
 
         // execute kernel
         cudaEventRecord(start, 0);
-        cudaMax<<<ceilf((float) n/threadBlockSize), threadBlockSize>>>(n, gap, deviceValues);
+        cudaMax<<<(int) ceilf((float) n/threadBlockSize), threadBlockSize>>>(size, gap, deviceValues);
         cudaEventRecord(stop, 0);
         // check whether the kernel invocation was successful
         checkCudaCall(cudaGetLastError());
 
         gap = gap * 2; 
-
-        /* Copy results to old and current */
-    }
+    }	
     // copy result back
     checkCudaCall(cudaMemcpy(values, deviceValues, n * sizeof(float), cudaMemcpyDeviceToHost));
     max = values[0];
-    cout << max << endl;
+    cout << "max cuda value: " <<  max << endl;
 
     checkCudaCall(cudaFree(deviceValues));
 
@@ -104,16 +116,21 @@ void calculateMax(int n, float* values){
 int main(int argc, char* argv[]) {
     float* values;
     timer vectorAddTimer("vector add timer");
-    int n = 4000;
+    int n = 300;
 
     values = new float[n];
     memset(values, 0, n * sizeof(float));
     fillRandom(values, n);
+    cout << "max serial: " << max_value(n, values) << endl;
 
     vectorAddTimer.start();
     calculateMax(n, values);
     vectorAddTimer.stop();
-
+	
+    cout << "max cuda: " << values[0] << endl;
+    for(int i = 0; i < n; i++){
+        //cout << values[i] << " " << endl;
+    }
     cout << vectorAddTimer;
     cout << "results OK!" << endl;
             
