@@ -88,8 +88,9 @@ void calculateMax(int n, float* values){
         /* Copy results to old and current */
     }
     // copy result back
-    max = deviceValues[0];
-    cout << "freaking c++ " << max << " " << endl;
+    checkCudaCall(cudaMemcpy(values, deviceValues, n * sizeof(float), cudaMemcpyDeviceToHost));
+    max = values[0];
+    cout << max << endl;
 
     checkCudaCall(cudaFree(deviceValues));
 
