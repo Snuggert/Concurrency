@@ -201,7 +201,6 @@ int main(int argc, char* argv[]) {
     vectorAddTimer.stop();
 
     cout << vectorAddTimer;
-    cout << "results OK!" << endl;
             
     delete[] old;
     delete[] current;
