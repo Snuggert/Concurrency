@@ -48,12 +48,6 @@ static void checkCudaCall(cudaError_t result) {
     }
 }
 
-
-__global__ void vectorAddKernel(float* deviceA, float* deviceB, float* deviceResult) {
-    unsigned index = blockIdx.x * blockDim.x + threadIdx.x;
-    deviceResult[index] = deviceA[index] + deviceB[index];
-}
-
 __global__ void waveStep(int N, float* old, float* current, float* next){
     unsigned i = blockIdx.x * blockDim.x + threadIdx.x + 1;
     if (i < (N - 1)){
@@ -61,64 +55,6 @@ __global__ void waveStep(int N, float* old, float* current, float* next){
             (0.2 * (current[i-1] - (2.0 * current[i]) + 
             current[i+1]));
     }
-}
-
-
-
-void vectorAddCuda(int n, float* a, float* b, float* result) {
-    int threadBlockSize = 512;
-
-    // allocate the vectors on the GPU
-    float* deviceA = NULL;
-    checkCudaCall(cudaMalloc((void **) &deviceA, n * sizeof(float)));
-    if (deviceA == NULL) {
-        cout << "could not allocate memory!" << endl;
-        return;
-    }
-    float* deviceB = NULL;
-    checkCudaCall(cudaMalloc((void **) &deviceB, n * sizeof(float)));
-    if (deviceB == NULL) {
-        checkCudaCall(cudaFree(deviceA));
-        cout << "could not allocate memory!" << endl;
-        return;
-    }
-    float* deviceResult = NULL;
-    checkCudaCall(cudaMalloc((void **) &deviceResult, n * sizeof(float)));
-    if (deviceResult == NULL) {
-        checkCudaCall(cudaFree(deviceA));
-        checkCudaCall(cudaFree(deviceB));
-        cout << "could not allocate memory!" << endl;
-        return;
-    }
-
-    cudaEvent_t start, stop;
-    cudaEventCreate(&start);
-    cudaEventCreate(&stop);
-
-    // copy the original vectors to the GPU
-    checkCudaCall(cudaMemcpy(deviceA, a, n*sizeof(float), cudaMemcpyHostToDevice));
-    checkCudaCall(cudaMemcpy(deviceB, b, n*sizeof(float), cudaMemcpyHostToDevice));
-
-    // execute kernel
-    cudaEventRecord(start, 0);
-    vectorAddKernel<<<n/threadBlockSize, threadBlockSize>>>(deviceA, deviceB, deviceResult);
-    cudaEventRecord(stop, 0);
-
-    // check whether the kernel invocation was successful
-    checkCudaCall(cudaGetLastError());
-
-    // copy result back
-    checkCudaCall(cudaMemcpy(result, deviceResult, n * sizeof(float), cudaMemcpyDeviceToHost));
-
-    checkCudaCall(cudaFree(deviceA));
-    checkCudaCall(cudaFree(deviceB));
-    checkCudaCall(cudaFree(deviceResult));
-
-    // print the time the kernel invocation took, without the copies!
-    float elapsedTime;
-    cudaEventElapsedTime(&elapsedTime, start, stop);
-    
-    cout << "kernel invocation took " << elapsedTime << " milliseconds" << endl;
 }
 
 void simulateCuda(int n, int max_t, float* old, float* current, float* next){
@@ -159,10 +95,8 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
 
         // execute kernel
         cudaEventRecord(start, 0);
-        vectorAddKernel<<<n/threadBlockSize, threadBlockSize>>>(deviceOld, deviceCurrent, deviceNext);
+        waveStep<<<ceilf((float) n/threadBlockSize), threadBlockSize>>>(n, deviceOld, deviceCurrent, deviceNext);
         cudaEventRecord(stop, 0);
-
-
         // check whether the kernel invocation was successful
         checkCudaCall(cudaGetLastError());
 
@@ -172,6 +106,7 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     }
     // copy result back
     checkCudaCall(cudaMemcpy(next, deviceNext, n * sizeof(float), cudaMemcpyDeviceToHost));
+    cout << "freaking c++ " << next[2] << " " << endl;
 
     checkCudaCall(cudaFree(deviceOld));
     checkCudaCall(cudaFree(deviceCurrent));
@@ -269,7 +204,7 @@ int main(int argc, char* argv[]) {
     }
 
     vectorAddTimer.start();
-    simulateCuda(i_max, old, current, next);
+    simulateCuda(i_max, t_max,  old, current, next);
     vectorAddTimer.stop();
 
     cout << vectorAddTimer;
