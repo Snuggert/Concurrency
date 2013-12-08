@@ -20,7 +20,7 @@ CC_OBJECTS	= $(CC_SOURCES:%.cc=%.o)
 %.ptx:		%.cu
 		$(NVCC) $(CU_FLAGS) --ptx $< -o $@
 
-vector-add:	$(CU_OBJECTS) $(CC_OBJECTS)
+vector-add:	$(CU_OBJECTS) $(CC_OBJECTS) file.o
 		$(NVCC) $^ -o $@
 
 ptx:		$(CU_PTX) 

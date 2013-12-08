@@ -58,7 +58,7 @@ __global__ void waveStep(int N, float* old, float* current, float* next){
 }
 
 void simulateCuda(int n, int max_t, float* old, float* current, float* next){
-    int threadBlockSize = 512;
+    int threadBlockSize = 8;
 
 
     // allocate the vectors on the GPU
@@ -90,13 +90,12 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     // copy the original vectors to the GPU
     checkCudaCall(cudaMemcpy(deviceOld, old, n*sizeof(float), cudaMemcpyHostToDevice));
     checkCudaCall(cudaMemcpy(deviceCurrent, current, n*sizeof(float), cudaMemcpyHostToDevice));
+    cudaEventRecord(start, 0);
 
     for(int i = 0; i < max_t; i++){
 
         // execute kernel
-        cudaEventRecord(start, 0);
         waveStep<<<ceilf((float) n/threadBlockSize), threadBlockSize>>>(n, deviceOld, deviceCurrent, deviceNext);
-        cudaEventRecord(stop, 0);
         // check whether the kernel invocation was successful
         checkCudaCall(cudaGetLastError());
 
@@ -106,7 +105,10 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     }
     // copy result back
     checkCudaCall(cudaMemcpy(next, deviceNext, n * sizeof(float), cudaMemcpyDeviceToHost));
-    cout << "freaking c++ " << next[2] << " " << endl;
+    cudaEventRecord(stop, 0);
+
+
+    // cout << "freaking c++ " << next[2] << " " << endl;
 
     checkCudaCall(cudaFree(deviceOld));
     checkCudaCall(cudaFree(deviceCurrent));
@@ -116,7 +118,7 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     float elapsedTime;
     cudaEventElapsedTime(&elapsedTime, start, stop);
     
-    cout << "kernel invocation took " << elapsedTime << " milliseconds" << endl;
+    // cout << "kernel invocation took " << elapsedTime << " milliseconds" << endl;
 
 }
 
@@ -200,7 +202,11 @@ int main(int argc, char* argv[]) {
     simulateCuda(i_max, t_max,  old, current, next);
     vectorAddTimer.stop();
 
-    cout << vectorAddTimer;
+    for(int i = 0; i < i_max; i++){
+        printf("%f\n", next[i]);
+    }
+
+    // cout << vectorAddTimer;
             
     delete[] old;
     delete[] current;
