@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <iostream>
+#include <time.h>
 
 #include "timer.h"
 
@@ -18,15 +19,13 @@ double gauss(double x)
     return exp((-1 * x * x) / 2);
 }
 
-void fill(float *array, int offset, int range, float sample_start,
-        float sample_end, func_t f)
+void fillRandom(float *array, int n)
 {
     int i;
-    float dx;
+    srand(time(NULL));
 
-    dx = (sample_end - sample_start) / range;
-    for (i = 0; i < range; i++) {
-        array[i + offset] = f(sample_start + i * dx);
+    for (i = 0; i < n; i++) {
+        array[i] = rand();
     }
 }
 
@@ -108,6 +107,7 @@ int main(int argc, char* argv[]) {
 
     values = new float[n];
     memset(values, 0, n * sizeof(float));
+    fillRandom(values, n);
 
     vectorAddTimer.start();
     calculateMax(n, values);
