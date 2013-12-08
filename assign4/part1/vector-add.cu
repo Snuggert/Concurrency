@@ -87,11 +87,11 @@ void simulateCuda(int n, int max_t, float* old, float* current, float* next){
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
-    for(int i = 0; i < max_t; i++){
+    // copy the original vectors to the GPU
+    checkCudaCall(cudaMemcpy(deviceOld, old, n*sizeof(float), cudaMemcpyHostToDevice));
+    checkCudaCall(cudaMemcpy(deviceCurrent, current, n*sizeof(float), cudaMemcpyHostToDevice));
 
-        // copy the original vectors to the GPU
-        checkCudaCall(cudaMemcpy(deviceOld, old, n*sizeof(float), cudaMemcpyHostToDevice));
-        checkCudaCall(cudaMemcpy(deviceCurrent, current, n*sizeof(float), cudaMemcpyHostToDevice));
+    for(int i = 0; i < max_t; i++){
 
         // execute kernel
         cudaEventRecord(start, 0);
