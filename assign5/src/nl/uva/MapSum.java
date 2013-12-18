@@ -34,5 +34,9 @@ public class MapSum extends MapReduceBase implements Mapper<LongWritable, Text, 
     @Override
     public void map(LongWritable k1, Text v1, OutputCollector<Text, Text> oc, Reporter rprtr) throws IOException {
         //Insert you code here. In this case you know you are reading from 
+    	Text emitKey = new Text(v1.toString().split("\t")[0]);
+    	Text emitValue = new Text(v1.toString().split("\t")[1]);
+
+    	oc.collect(emitKey, emitValue);
     }
 }
