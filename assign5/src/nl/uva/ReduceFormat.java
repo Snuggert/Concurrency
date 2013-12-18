@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -20,6 +21,7 @@ import org.apache.hadoop.mapred.Reporter;
 public class ReduceFormat extends MapReduceBase implements Reducer<IntWritable, Text, Text, Text> {
 
     Log log = LogFactory.getLog(nl.uva.ReduceFormat.class);
+    // NoOpLog log = new NoOpLog();
 
     @Override
     public void reduce(IntWritable k2, Iterator<Text> itrtr, OutputCollector<Text, Text> oc, Reporter rprtr) throws IOException {
