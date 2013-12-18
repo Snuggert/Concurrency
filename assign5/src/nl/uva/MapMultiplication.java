@@ -7,6 +7,7 @@ package nl.uva;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -27,6 +28,8 @@ import org.apache.hadoop.mapred.Reporter;
 public class MapMultiplication extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
     Log log = LogFactory.getLog(nl.uva.MapMultiplication.class);
+    // NoOpLog log = new NoOpLog();
+    
     private String matrixName;
     private Text elements = new Text();
     private Text emitKey = new Text();
@@ -56,13 +59,51 @@ public class MapMultiplication extends MapReduceBase implements Mapper<LongWrita
     public void map(LongWritable key, Text value, OutputCollector<Text, Text> oc, Reporter rprtr) throws IOException {
         String rowColNum = value.toString().split("\t")[0];
         String rowCol = value.toString().split("\t")[1];
-        StringBuilder sb = new StringBuilder();
-        if (matrixName.equals("A")) {
+        String[] rowColSplit = rowCol.split(" ");
+        Text newKey;
+        Text newValue;
+        StringBuilder sb;
+        if (matrixName.equals("A")){
         //Insert you code here. In this case you know you are reading from 
-        //matrix A. Decide how to counstruct your key. 
-        } else if (matrixName.equals("B")) {
+        //matrix A. Decide how to counstruct your key.
+            for(int i = 0; i<rowColSplit.length; i+=numOfMul){
+                sb = new StringBuilder();
+                for(int j = i; j<numOfMul; j++){
+                    sb.append(rowColSplit[j]);
+                    sb.append(" ");
+                }
+                newValue = new Text(sb.toString());
+
+                for(int h = 0; h<numOfColumnsInC; h++){
+                    sb = new StringBuilder();
+                    sb.append(h);
+                    sb.append("\t");
+                    sb.append(rowColNum);
+                    newKey = new Text(sb.toString());               
+                    oc.collect(newKey, newValue);
+                }
+            }
+        } 
+        else if (matrixName.equals("B")){
         //Insert you code here. In this case you know you are reading from 
-        //matrix B. Decide how to counstruct your key.    
+        //matrix B. Decide how to counstruct your key.
+            for(int i = 0; i<rowColSplit.length; i+=numOfMul){
+                sb = new StringBuilder();
+                for(int j = i; j<numOfMul; j++){
+                    sb.append(rowColSplit[j]);
+                    sb.append(" ");
+                }
+                newValue = new Text(sb.toString());
+
+                for(int h = 0; h<numOfRowsInC; h++){
+                    sb = new StringBuilder();
+                    sb.append(rowColNum);
+                    sb.append("\t");
+                    sb.append(h);
+                    newKey = new Text(sb.toString());               
+                    oc.collect(newKey, newValue);
+                }
+            }  
         }
     }
 }

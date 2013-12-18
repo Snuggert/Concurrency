@@ -7,6 +7,7 @@ package nl.uva;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -24,6 +25,8 @@ import org.apache.hadoop.mapred.Reporter;
 public class MapTranspose extends MapReduceBase implements Mapper<LongWritable, Text, IntWritable, Text> {
 
     Log log = LogFactory.getLog(nl.uva.MapTranspose.class);
+    // NoOpLog log = new NoOpLog();
+    
     private Text columns = new Text();
     private IntWritable emitKey = new IntWritable();
 

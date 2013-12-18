@@ -6,6 +6,7 @@ package nl.uva;
 
 import java.io.IOException;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -25,6 +26,8 @@ import org.apache.hadoop.mapred.Reporter;
 public class MapAddRowNums extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
     Log log = LogFactory.getLog(nl.uva.MapAddRowNums.class);
+    // NoOpLog log = new NoOpLog();
+    
     private String matrixName;
     private long mapInputStart;
 

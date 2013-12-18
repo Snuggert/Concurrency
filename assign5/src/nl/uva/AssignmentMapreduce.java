@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.NoOpLog;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -33,6 +34,7 @@ import org.apache.hadoop.util.ToolRunner;
 public class AssignmentMapreduce extends Configured implements Tool {
 
     static Log log = LogFactory.getLog(AssignmentMapreduce.class);
+    // static NoOpLog log = new NoOpLog();
     /**
      * The path in the local file system for matrix A
      */
@@ -85,7 +87,7 @@ public class AssignmentMapreduce extends Configured implements Tool {
                 printHelp();
                 System.exit(-1);
             }
-//            args = new String[]{"A", "B", "out", "1"};
+            //args = new String[]{"A", "B", "out", "1"};
             //Set the input arguments 
             matrixA = args[0];
             matrixB = args[1];
@@ -202,7 +204,6 @@ public class AssignmentMapreduce extends Configured implements Tool {
         JobConf jobMultiplicationConf = configureMultiplicationJob();
         log.info("Running multiplication job");
         JobClient.runJob(jobMultiplicationConf);
-
 
         //Rename the result into C 
         outPutPath = FileOutputFormat.getOutputPath(jobMultiplicationConf);
