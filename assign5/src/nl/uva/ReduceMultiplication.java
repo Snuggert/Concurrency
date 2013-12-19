@@ -32,39 +32,37 @@ public class ReduceMultiplication extends MapReduceBase implements Reducer<Text,
     @Override
     public void reduce(Text key, Iterator<Text> valueItrtr, OutputCollector<Text, Text> output, Reporter rprtr) throws IOException {
         //The rows and columns will be grouped on the same keys. 
-        //You have to split  them 
-        Text a = valueItrtr.next();
-        Text b = valueItrtr.next();
+        //You have to split  them
+        StringBuilder sb;
+        Text a = new Text(valueItrtr.next().toString());
+        Text b = new Text(valueItrtr.next().toString());             
+
         String[] aSplit = a.toString().split(" ");
         String[] bSplit = b.toString().split(" ");
+        
+        String rowKey = key.toString().split("\t")[0];
+        String colKey = key.toString().split("\t")[1];
+        
+        emitKey.set(colKey + "," + rowKey);
 
         if(bSplit.length != aSplit.length){
             System.out.println("Matrices are not aligned");
             System.exit(-1);
         }
 
-        System.out.println("A: " + a.toString());
-        System.out.println("B: " + b.toString());
-        System.out.println("Key location: " + key.toString());
+        // System.out.println("A: " + a.toString());
+        // System.out.println("B: " + b.toString());
+        // System.out.println("Key location: " + key.toString());
 
         Double result;
-        StringBuilder sb = new StringBuilder();
         for(int i = 0; i < aSplit.length; i++){
+            sb = new StringBuilder();
             result = Double.parseDouble(aSplit[i]) * 
                      Double.parseDouble(bSplit[i]);
             sb.append(result);
-            sb.append(" ");
+            emitValue = new Text(sb.toString());        
+            output.collect(emitKey, emitValue);
         }
-        emitValue = new Text(sb.toString());
-        
         rprtr.incrCounter(ReduceMultiplication.Counters.RESAULT, 1);
-        
-        //Set these values so the output key represents the correct element of the 
-        //result matrix C
-        String rowKey = key.toString().split("\t")[0];
-        String colKey = key.toString().split("\t")[1];
-        emitKey.set(colKey + "," + rowKey);
-
-        output.collect(emitKey, emitValue);
     }
 }

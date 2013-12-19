@@ -35,15 +35,16 @@ public class ReduceSum extends MapReduceBase implements Reducer<Text, Text, Text
     public void reduce(Text k2, Iterator<Text> itrtr, OutputCollector<Text, Text> oc, Reporter rprtr) throws IOException {
         Double result = Double.valueOf(0);
         while (itrtr.hasNext()) {
-           //Incert your code here to do the summation 
+            result += Double.parseDouble(itrtr.next().toString());
         }
+        // System.out.println("Key location: " + k2.toString());
         
         //Here you have to calculate the rowNum and columnNum to use them as a key
-        rowNum = null;
-        columnNum = null;
+        rowNum = k2.toString().split(",")[0];
+        columnNum = k2.toString().split(",")[1];
         
         value.set(columnNum + "," + result);
         key.set(rowNum);
-        oc.collect(k2, value);
+        oc.collect(key, value);
     }
 }
