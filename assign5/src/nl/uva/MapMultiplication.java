@@ -80,7 +80,7 @@ public class MapMultiplication extends MapReduceBase implements Mapper<LongWrita
                     sb.append("\t");
                     sb.append(rowColNum);
                     sb.append("\t");
-                    sb.append(int(i/numOfMul));
+                    sb.append(i/numOfMul);
                     newKey = new Text(sb.toString());               
                     oc.collect(newKey, newValue);
                 }
@@ -102,6 +102,8 @@ public class MapMultiplication extends MapReduceBase implements Mapper<LongWrita
                     sb.append(rowColNum);
                     sb.append("\t");
                     sb.append(h);
+                    sb.append("\t");
+                    sb.append(i/numOfMul);
                     newKey = new Text(sb.toString());               
                     oc.collect(newKey, newValue);
                 }
