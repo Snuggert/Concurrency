@@ -79,6 +79,8 @@ public class MapMultiplication extends MapReduceBase implements Mapper<LongWrita
                     sb.append(h);
                     sb.append("\t");
                     sb.append(rowColNum);
+                    sb.append("\t");
+                    sb.append(int(i/numOfMul));
                     newKey = new Text(sb.toString());               
                     oc.collect(newKey, newValue);
                 }

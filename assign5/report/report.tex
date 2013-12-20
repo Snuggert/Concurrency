@@ -1,0 +1,22 @@
+\documentclass[10pt]{article}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{capt-of}
+\title{\bfseries\Huge Abe Wiersma, Bram van den Akker}
+
+\date{}
+\begin{document}
+\title{Map Reduce}
+\author{Abe Wiersma, Bram van den Akker}
+\date{\today}
+\maketitle
+\newpage
+
+\section{Map/Reduce multiplication}
+\subsection{Map}
+The map function in the multiplication part of the map reduce first checks what matrix is presented to the map function and then decides to give keys in the columns or give keys in rows. If the rowCol comes from matrix A the rowCol is given keys (rowIn, col0...K) and given to the outputcollector, else if the rowCol comes from matrix B the rowCol is given keys (row0...I, colKn).
+
+\end{document}
