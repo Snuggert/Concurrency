@@ -19,4 +19,10 @@
 \subsection{Map}
 The map function in the multiplication part of the map reduce first checks what matrix is presented to the map function and then decides to give keys in the columns or give keys in rows. If the rowCol comes from matrix A the rowCol is given keys (rowIn, col0...K) and given to the outputcollector, else if the rowCol comes from matrix B the rowCol is given keys (row0...I, colKn).
 
+\subsection{Reduce}
+The reduce function takes it's given numbers and multiplies them, then gives them to the outputcollector with the keys given by the previous map function.
+
+\section{Map/Reduce AddRowNums}
+\subsection{Map}
+
 \end{document}
